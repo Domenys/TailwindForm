@@ -27,6 +27,7 @@
         </h1>
         <div
           class="
+          animate-bounce
           w-80
           mb-12
           font-bold
@@ -56,6 +57,7 @@
         </div>
         <div
           class="
+          animate-bounce
           w-80
           mb-12
           font-bold
@@ -99,6 +101,10 @@
             border-2
             border-black
 
+            bg-blue-600 
+            hover:bg-red-600
+            text-white
+
             rounded-lg
 
             transition 
@@ -122,6 +128,10 @@
             border-dashed
             border-2
             border-black
+
+            bg-blue-600 
+            hover:bg-red-600
+            text-white
 
             rounded-lg
 
@@ -163,22 +173,36 @@
     >
       <div class="login-validate-text">
         <span class="block">Вы вошли под своей учётной записью.</span>
-        <span class="block">Сейчас вы будете перемещены на главную страницу.</span>
+        <span class="block">Для перехода на главную страницу - нажмите кнопку "ПЕРЕЙТИ".</span>
+      </div>
+      <div v-show="progressBarShow" class="dt-progress-bar-container relative max-w-xl rounded-full overflow-hidden w-full h-full">
+        <div class="h-3 relative max-w-xl rounded-full overflow-hidden">
+          <div class="w-full h-full bg-gray-200 absolute"></div>
+          <div id="bar" class="h-full bg-green-500 relative w-0" :style="{'width' : progress + '%'}"></div>
+        </div>
       </div>
       <button 
       class="
+      flex
+      items-center
+
+      uppercase
+      font-bold
+
       border-solid
       border-2
       border-black
 
-      w-24
-
       mt-2
-      mb-0
+      mb-2
       p-2
       "
       @click="goToHomepage"
       >
+        <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
         Перейти
       </button>
     </div>
@@ -258,13 +282,16 @@
 export default {
   name: 'Login',
   data: () => ({
+    progress: 0,
+    invervalSpeed: 10,
+    incrementSpeed: 0.5,
+    progressBarShow: false,
     loginEmail: '',
     loginPassword: '',
     isValidate: false,
     isNotValidate: false
   }),
   methods: {
-
     //Отправка логина на сервер
     login() {
       let resultValidate = this.loginValidate(this.loginEmail)
@@ -283,7 +310,8 @@ export default {
 
     // Переход на главную страницу
     goToHomepage() {
-      this.$router.push('/')
+      this.progressBarShow = true
+      this.progressBar()
     },
 
     //Переход на страницу восстановления пароля
@@ -296,6 +324,18 @@ export default {
       this.isNotValidate = false
       this.loginEmail = ''
       this.loginPassword = ''
+    },
+
+    progressBar() {
+      let intval = setInterval(() => {
+        if(this.progress < 100) {
+          this.progress += this.incrementSpeed
+        }
+        else {
+          clearInterval(intval)
+          this.$router.push('/')
+        }
+      }, this.invervalSpeed)
     }
   }
 }
